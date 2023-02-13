@@ -1,0 +1,38 @@
+package main
+
+import (
+	"fmt"
+	"rabbit-mq-consumer/conf"
+	"rabbit-mq-consumer/model/gamebo"
+	"rabbit-mq-consumer/queue"
+
+	"github.com/streadway/amqp"
+)
+
+func main() {
+	conf.Init()
+
+	err := queue.RabbitMqClient.StartConsumer("golang-remote-queue", "game-bo-requestlog-key", handler, 2)
+
+	if err != nil {
+		panic(err)
+	}
+
+	forever := make(chan bool)
+	<-forever
+}
+
+func handler(d amqp.Delivery) bool {
+	if d.Body == nil {
+		fmt.Println("Error, no message body!")
+		return false
+	}
+	fmt.Println(string(d.Body))
+
+	req := gamebo.GameBoRequestApiLog{
+		Request: string(d.Body),
+	}
+	req.InsertLog()
+
+	return true
+}

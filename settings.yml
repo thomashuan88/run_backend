@@ -1,0 +1,5 @@
+settings:
+  miscLogsDB:
+    url: stagenvclub:dbNnyddWSWT4@tcp(maindb-stage.n88club.local:3306)/misc_logs?charset=utf8mb4&parseTime=True&loc=Local
+  rabbitmq:
+    url: amqp://php:php@10.11.111.71
