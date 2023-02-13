@@ -1,7 +1,14 @@
 package main
 
-import "rabbit-mq-consumer/tasks"
+import (
+	"run-backend/tasks"
+
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
-	tasks.Router()
+	r := gin.Default()
+
+	tasks.SetupGameboRoutes(r)
+	r.Run(":8080")
 }

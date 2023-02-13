@@ -1,12 +1,13 @@
 package tasks
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Response struct {
@@ -20,7 +21,7 @@ var startTime time.Time
 var memStats runtime.MemStats
 var stopSignal = make(chan struct{})
 
-func startHandler(w http.ResponseWriter, r *http.Request) {
+func startHandler(c *gin.Context) {
 
 	// Initialize stop channel
 	stopSignal = make(chan struct{})
@@ -32,19 +33,19 @@ func startHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Return JSON response
 	response := Response{"Process started", true, "", 0}
-	json.NewEncoder(w).Encode(response)
+	c.JSON(http.StatusOK, gin.H{"data": response})
 }
 
-func stopHandler(w http.ResponseWriter, r *http.Request) {
+func stopHandler(c *gin.Context) {
 	// Stop Goroutine process
 	stopSignal <- struct{}{}
 
 	// Return JSON response
 	response := Response{"Process stopped", false, "", 0}
-	json.NewEncoder(w).Encode(response)
+	c.JSON(http.StatusOK, gin.H{"data": response})
 }
 
-func statusHandler(w http.ResponseWriter, r *http.Request) {
+func statusHandler(c *gin.Context) {
 	// Get runtime stats
 	durTime := time.Since(startTime).String()
 
@@ -57,7 +58,7 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Return JSON response
 	response := Response{"Process running", alive, durTime, memUsage}
-	json.NewEncoder(w).Encode(response)
+	c.JSON(http.StatusOK, gin.H{"data": response})
 }
 
 func longRunningProcess(stop chan struct{}) {
@@ -90,9 +91,9 @@ func isProcessAlive() bool {
 	return false
 }
 
-func Router() {
-	http.HandleFunc("/gamebo_req/start", startHandler)
-	http.HandleFunc("/gamebo_req/stop", stopHandler)
-	http.HandleFunc("/gamebo_req/status", statusHandler)
-	http.ListenAndServe(":8080", nil)
+func SetupGameboRoutes(r *gin.Engine) {
+	gamebo_req := r.Group("/users")
+	gamebo_req.GET("/gamebo_req/start", startHandler)
+	gamebo_req.GET("/gamebo_req/stop", stopHandler)
+	gamebo_req.GET("/gamebo_req/status", statusHandler)
 }
