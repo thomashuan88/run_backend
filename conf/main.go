@@ -1,8 +1,8 @@
 package conf
 
 import (
-	"rabbit-mq-consumer/model"
-	"rabbit-mq-consumer/queue"
+	"run-backend/model"
+	"run-backend/queue"
 
 	"github.com/joho/godotenv"
 )

@@ -46,19 +46,24 @@ func stopHandler(c *gin.Context) {
 }
 
 func statusHandler(c *gin.Context) {
-	// Get runtime stats
-	durTime := time.Since(startTime).String()
-
-	// Get memory usage stats
-	runtime.ReadMemStats(&memStats)
-	memUsage := int(memStats.Alloc) / 1024 / 1024
-
 	// Check if process is still alive
 	alive := isProcessAlive()
 
-	// Return JSON response
-	response := Response{"Process running", alive, durTime, memUsage}
-	c.JSON(http.StatusOK, gin.H{"data": response})
+	if alive {
+		durTime := time.Since(startTime).String()
+
+		// Get memory usage stats
+		runtime.ReadMemStats(&memStats)
+		memUsage := int(memStats.Alloc) / 1024 / 1024
+
+		// Return JSON response
+		response := Response{"Process running", true, durTime, memUsage}
+		c.JSON(http.StatusOK, gin.H{"data": response})
+	} else {
+		response := Response{"Process not running", false, "", 0}
+		c.JSON(http.StatusOK, gin.H{"data": response})
+	}
+
 }
 
 func longRunningProcess(stop chan struct{}) {
@@ -92,7 +97,7 @@ func isProcessAlive() bool {
 }
 
 func SetupGameboRoutes(r *gin.Engine) {
-	gamebo_req := r.Group("/users")
+	gamebo_req := r.Group("/api")
 	gamebo_req.GET("/gamebo_req/start", startHandler)
 	gamebo_req.GET("/gamebo_req/stop", stopHandler)
 	gamebo_req.GET("/gamebo_req/status", statusHandler)

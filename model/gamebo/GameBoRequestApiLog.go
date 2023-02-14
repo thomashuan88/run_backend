@@ -2,7 +2,7 @@ package gamebo
 
 import (
 	"fmt"
-	"rabbit-mq-consumer/model"
+	"run-backend/model"
 )
 
 type GameBoRequestApiLog struct {

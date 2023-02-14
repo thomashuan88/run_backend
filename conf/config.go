@@ -1,7 +1,6 @@
 package conf
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -16,11 +15,13 @@ var cfgMiscLogsDB, cfgRabbitMq *viper.Viper
 func LoadConfig() {
 	viper.SetConfigFile(path)
 	content, err := ioutil.ReadFile(path)
-
+	if err != nil {
+		log.Fatalf("Read config file fail: %s", err.Error())
+	}
 	//Replace environment variables
 	err = viper.ReadConfig(strings.NewReader(os.ExpandEnv(string(content))))
 	if err != nil {
-		log.Fatal(fmt.Sprintf("Parse config file fail: %s", err.Error()))
+		log.Fatalf("Parse config file fail: %s", err.Error())
 	}
 
 	cfgMiscLogsDB = viper.Sub("settings.miscLogsDB")
