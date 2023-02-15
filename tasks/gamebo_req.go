@@ -3,11 +3,14 @@ package tasks
 import (
 	"fmt"
 	"net/http"
+	"run-backend/model/gamebo"
+	"run-backend/queue"
 	"runtime"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/streadway/amqp"
 )
 
 type Response struct {
@@ -66,17 +69,19 @@ func statusHandler(c *gin.Context) {
 
 }
 
-func longRunningProcess(stop chan struct{}) {
+func longRunningProcess(stop chan struct{}) error {
 	// Your long running process logic here
 	for {
 		select {
 		case <-stop:
 			// Stop the long running process
-			return
+			return nil
 		default:
 			// Do some work here
-			fmt.Println("do something!")
-			time.Sleep(2 * time.Second)
+			err := queue.RabbitMqClient.StartConsumer("golang-remote-queue", "game-bo-requestlog-key", handler, 2)
+			if err != nil {
+				return err
+			}
 		}
 	}
 }
@@ -94,6 +99,21 @@ func isProcessAlive() bool {
 	}
 
 	return false
+}
+
+func handler(d amqp.Delivery) bool {
+	if d.Body == nil {
+		fmt.Println("Error, no message body!")
+		return false
+	}
+	fmt.Println(string(d.Body))
+
+	req := gamebo.GameBoRequestApiLog{
+		Request: string(d.Body),
+	}
+	req.InsertLog()
+
+	return true
 }
 
 func SetupGameboRoutes(r *gin.Engine) {
