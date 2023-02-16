@@ -110,7 +110,7 @@ func (conn Conn) StartConsumer(
 				}
 			}
 			fmt.Println("Rabbit consumer closed - critical Error")
-			os.Exit(1)
+			// os.Exit(1)
 		// }()
 	}
 	return nil
