@@ -17,7 +17,6 @@ type Conn struct {
 // 初始化rabbitMq连接
 func RabbitMq(url string) {
 	conn, err := GetConn(url)
-
 	if err != nil {
 		panic("rabbitmq连接异常: " + err.Error())
 	}
@@ -98,7 +97,9 @@ func (conn Conn) StartConsumer(
 	for i := 0; i < concurrency; i++ {
 		fmt.Printf("Processing messages on thread %v...\n", i)
 		go func() {
+
 			for msg := range msgs {
+				fmt.Println(msg)
 				// if tha handler returns true then ACK, else NACK
 				// the message back into the rabbit queue for
 				// another round of processing
