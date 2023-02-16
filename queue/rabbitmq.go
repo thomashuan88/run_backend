@@ -2,7 +2,7 @@ package queue
 
 import (
 	"fmt"
-	"os"
+	// "os"
 
 	"github.com/streadway/amqp"
 )
