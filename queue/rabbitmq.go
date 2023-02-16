@@ -96,7 +96,7 @@ func (conn Conn) StartConsumer(
 	// create a goroutine for the number of concurrent threads requested
 	for i := 0; i < concurrency; i++ {
 		fmt.Printf("Processing messages on thread %v...\n", i)
-		go func() {
+		// go func() {
 
 			for msg := range msgs {
 				fmt.Println(msg)
@@ -111,7 +111,7 @@ func (conn Conn) StartConsumer(
 			}
 			fmt.Println("Rabbit consumer closed - critical Error")
 			os.Exit(1)
-		}()
+		// }()
 	}
 	return nil
 }
