@@ -82,10 +82,6 @@ func longRunningProcess(stop chan struct{}) error {
 			if err != nil {
 				return err
 			}
-			err = queue.RabbitMqClient.StartConsumer("golang-remote-queue", "gorm-slowquery-key", handler2, 2)
-			if err != nil {
-				return err
-			}
 		}
 	}
 }
@@ -116,16 +112,6 @@ func handler(d amqp.Delivery) bool {
 		Request: string(d.Body),
 	}
 	req.InsertLog()
-
-	return true
-}
-
-func handler2(d amqp.Delivery) bool {
-	if d.Body == nil {
-		fmt.Println("Error, no message body!")
-		return false
-	}
-	fmt.Println(string(d.Body))
 
 	return true
 }

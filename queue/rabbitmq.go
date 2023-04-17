@@ -98,19 +98,19 @@ func (conn Conn) StartConsumer(
 		fmt.Printf("Processing messages on thread %v...\n", i)
 		// go func() {
 
-			for msg := range msgs {
-				// fmt.Println(msg)
-				// if tha handler returns true then ACK, else NACK
-				// the message back into the rabbit queue for
-				// another round of processing
-				if handler(msg) {
-					msg.Ack(false)
-				} else {
-					msg.Nack(false, true)
-				}
+		for msg := range msgs {
+			fmt.Println(msg)
+			// if tha handler returns true then ACK, else NACK
+			// the message back into the rabbit queue for
+			// another round of processing
+			if handler(msg) {
+				msg.Ack(false)
+			} else {
+				msg.Nack(false, true)
 			}
-			fmt.Println("Rabbit consumer closed - critical Error")
-			// os.Exit(1)
+		}
+		fmt.Println("Rabbit consumer closed - critical Error")
+		// os.Exit(1)
 		// }()
 	}
 	return nil
